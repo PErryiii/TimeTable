@@ -1,0 +1,70 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorYellow300</item>
+        <item name="colorPrimaryDark">@color/colorYellow300</item>
+        <item name="colorAccent">@color/colorYellow400</item>
+    </style>
+
+    <style name="FragmentContent">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:background">@color/colorOrange50</item>
+    </style>
+    
+    <style name="TabItemTextStyle">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">18dp</item>
+        <item name="android:textColor">@color/colorBlack</item>
+        <item name="android:layout_gravity">center</item>
+        <item name="android:gravity">center</item>
+    </style>
+
+    <!--note标题-->
+    <style name="TextNoteItemTitleStyle">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:gravity">left</item>
+        <item name="android:layout_gravity">center</item>
+        <item name="android:text">"Title"</item>
+        <item name="android:textSize">20dp</item>
+    </style>
+
+    <!--note正文-->
+    <style name="TextNoteItemContentStyle">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:gravity">left</item>
+        <item name="android:layout_gravity">center</item>
+        <item name="android:text">"Content"</item>
+        <item name="android:textSize">16dp</item>
+    </style>
+
+    <!--星期条text-->
+    <style name="TextWeekday">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textSize">12dp</item>
+    </style>
+
+    <!--table左侧数字栏-->
+    <style name="LeftClassNumText">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">60dp</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textSize">12dp</item>
+    </style>
+
+    <style name="EditTableEditText">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginLeft">30dp</item>
+        <item name="android:layout_marginRight">30dp</item>
+    </style>
+
+</resources>

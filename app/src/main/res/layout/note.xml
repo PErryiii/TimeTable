@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout  xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/linearLayout_notesFragment"
+    android:orientation="vertical"
+    style="@style/FragmentContent"
+    tools:context="com.example.timetable_1.MainActivity">
+
+    <!--正文-->
+    <android.support.design.widget.CoordinatorLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <FrameLayout
+            android:id="@+id/frameLayout_note_fragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+        </FrameLayout>
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab_notesFragment_addNote"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="15dp"
+            app:layout_anchor="@id/frameLayout_note_fragment"
+            app:layout_anchorGravity="bottom|end"
+            app:backgroundTint="@color/colorYellow300"
+            app:rippleColor="@color/colorWhite"
+            android:src="@mipmap/ic_add_white_24x24"
+            app:borderWidth="0dp"
+            app:fabSize="auto" />
+
+    </android.support.design.widget.CoordinatorLayout>
+
+</LinearLayout>
