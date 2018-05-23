@@ -20,9 +20,12 @@ public class TableDbHelper extends SQLiteOpenHelper {
     public static final String COLUMN_NAME = "name";
     public static final String COLUMN_ROOM = "room";
     public static final String COLUMN_TEACHER = "teacher";
-    public static final String COLUMN_DAY = "day";
-    public static final String COLUMN_START = "start";
     public static final String COLUMN_CLASSNUM = "classNum";
+    public static final String COLUMN_TIME = "time";
+    public static final String COLUMN_ALARMABLE = "alarmAble";
+    public static final String COLUMN_NOTIFYABLE = "notifyAble";
+    public static final String COLUMN_INFO = "info";
+    public static final String COLUMN_COLOR = "color";
 
     private static final String SQL_CREATE_ENTRIES =        //建表
             "CREATE TABLE "+TABLE_NAME+" ("+
@@ -30,9 +33,12 @@ public class TableDbHelper extends SQLiteOpenHelper {
                     COLUMN_NAME+" TEXT, "+
                     COLUMN_ROOM+" TEXT, "+
                     COLUMN_TEACHER+" TEXT, "+
-                    COLUMN_DAY+" INTEGER, "+
-                    COLUMN_START+" INTEGER, "+
-                    COLUMN_CLASSNUM+" INTEGER);";
+                    COLUMN_CLASSNUM+" INTEGER, "+
+                    COLUMN_TIME+" INTEGER, "+
+                    COLUMN_ALARMABLE+" BIT, "+
+                    COLUMN_NOTIFYABLE+" BIT, "+
+                    COLUMN_INFO+" TEXT, "+
+                    COLUMN_COLOR+" TEXT);";
 
     public TableDbHelper(Context context){
         super(context, DATABASE_NAME, null, VERSION);

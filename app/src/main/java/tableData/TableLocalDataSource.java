@@ -8,6 +8,8 @@ import android.database.sqlite.SQLiteDatabase;
 import java.util.ArrayList;
 import java.util.List;
 
+import tableList.Table;
+
 /**
  * Created by PErry on 2018/3/22.
  */
@@ -46,9 +48,12 @@ public class TableLocalDataSource implements TableDataSource {
         values.put(TableDbHelper.COLUMN_NAME, course.name);
         values.put(TableDbHelper.COLUMN_ROOM, course.room);
         values.put(TableDbHelper.COLUMN_TEACHER, course.teacher);
-        values.put(TableDbHelper.COLUMN_DAY, course.day);
-        values.put(TableDbHelper.COLUMN_START, course.start);
         values.put(TableDbHelper.COLUMN_CLASSNUM, course.classNum);
+        values.put(TableDbHelper.COLUMN_TIME, course.time);
+        values.put(TableDbHelper.COLUMN_ALARMABLE, course.alarmAble);
+        values.put(TableDbHelper.COLUMN_NOTIFYABLE, course.notifyAble);
+        values.put(TableDbHelper.COLUMN_INFO, course.info);
+        values.put(TableDbHelper.COLUMN_COLOR, course.color);
 
         database.insert(TableDbHelper.TABLE_NAME, null, values);
         database.close();
@@ -68,6 +73,16 @@ public class TableLocalDataSource implements TableDataSource {
         database.close();
     }
 
+    /**
+     * 删除课程表
+     * */
+    @Override
+    public void deleteTable() {
+        SQLiteDatabase database = dbHelper.getWritableDatabase();
+
+        database.delete(TableDbHelper.TABLE_NAME, null, null);
+        database.close();
+    }
 
     /**
      * 根据id查看课程
@@ -82,9 +97,12 @@ public class TableLocalDataSource implements TableDataSource {
                 TableDbHelper.COLUMN_NAME,
                 TableDbHelper.COLUMN_ROOM,
                 TableDbHelper.COLUMN_TEACHER,
-                TableDbHelper.COLUMN_DAY,
-                TableDbHelper.COLUMN_START,
-                TableDbHelper.COLUMN_CLASSNUM
+                TableDbHelper.COLUMN_CLASSNUM,
+                TableDbHelper.COLUMN_TIME,
+                TableDbHelper.COLUMN_ALARMABLE,
+                TableDbHelper.COLUMN_NOTIFYABLE,
+                TableDbHelper.COLUMN_INFO,
+                TableDbHelper.COLUMN_COLOR
         };
         String selection = TableDbHelper.COLUMN_ID + " LIKE ?";
         String[] selectionArgs = {courseId};
@@ -100,11 +118,15 @@ public class TableLocalDataSource implements TableDataSource {
                 String name = cursor.getString(cursor.getColumnIndex(TableDbHelper.COLUMN_NAME));
                 String room = cursor.getString(cursor.getColumnIndex(TableDbHelper.COLUMN_ROOM));
                 String teacher = cursor.getString(cursor.getColumnIndex(TableDbHelper.COLUMN_TEACHER));
-                int day = cursor.getInt(cursor.getColumnIndex(TableDbHelper.COLUMN_DAY));
-                int start = cursor.getInt(cursor.getColumnIndex(TableDbHelper.COLUMN_START));
                 int classNum = cursor.getInt(cursor.getColumnIndex(TableDbHelper.COLUMN_CLASSNUM));
+                long time = cursor.getLong(cursor.getColumnIndex(TableDbHelper.COLUMN_TIME));
+                boolean alarmAble = cursor.getInt(cursor.getColumnIndex(TableDbHelper.COLUMN_ALARMABLE))>0;
+                boolean notifyAble = cursor.getInt(cursor.getColumnIndex(TableDbHelper.COLUMN_NOTIFYABLE))>0;
+                String info = cursor.getString(cursor.getColumnIndex(TableDbHelper.COLUMN_INFO));
+                String color = cursor.getString(cursor.getColumnIndex(TableDbHelper.COLUMN_COLOR));
 
-                course = new Course(id, name, room, teacher, day, start, classNum);
+                course = new Course(id, name, room, teacher, classNum, time, alarmAble, notifyAble,
+                        info, color);
             }
         }catch (Exception e){
             loadCourseCallback.loadFailed();
@@ -136,9 +158,12 @@ public class TableLocalDataSource implements TableDataSource {
                 TableDbHelper.COLUMN_NAME,
                 TableDbHelper.COLUMN_ROOM,
                 TableDbHelper.COLUMN_TEACHER,
-                TableDbHelper.COLUMN_DAY,
-                TableDbHelper.COLUMN_START,
-                TableDbHelper.COLUMN_CLASSNUM
+                TableDbHelper.COLUMN_CLASSNUM,
+                TableDbHelper.COLUMN_TIME,
+                TableDbHelper.COLUMN_ALARMABLE,
+                TableDbHelper.COLUMN_NOTIFYABLE,
+                TableDbHelper.COLUMN_INFO,
+                TableDbHelper.COLUMN_COLOR
         };
 
         Cursor cursor = null;
@@ -151,10 +176,14 @@ public class TableLocalDataSource implements TableDataSource {
                     String name = cursor.getString(cursor.getColumnIndex(TableDbHelper.COLUMN_NAME));
                     String room = cursor.getString(cursor.getColumnIndex(TableDbHelper.COLUMN_ROOM));
                     String teacher = cursor.getString(cursor.getColumnIndex(TableDbHelper.COLUMN_TEACHER));
-                    int day = cursor.getInt(cursor.getColumnIndex(TableDbHelper.COLUMN_DAY));
-                    int start = cursor.getInt(cursor.getColumnIndex(TableDbHelper.COLUMN_START));
                     int classNum = cursor.getInt(cursor.getColumnIndex(TableDbHelper.COLUMN_CLASSNUM));
-                    Course course = new Course(id, name, room, teacher, day, start, classNum);
+                    long time = cursor.getLong(cursor.getColumnIndex(TableDbHelper.COLUMN_TIME));
+                    boolean alarmAble = cursor.getInt(cursor.getColumnIndex(TableDbHelper.COLUMN_ALARMABLE))>0;
+                    boolean notifyAble = cursor.getInt(cursor.getColumnIndex(TableDbHelper.COLUMN_NOTIFYABLE))>0;
+                    String info = cursor.getString(cursor.getColumnIndex(TableDbHelper.COLUMN_INFO));
+                    String color = cursor.getString(cursor.getColumnIndex(TableDbHelper.COLUMN_COLOR));
+                    Course course = new Course(id, name, room, teacher, classNum, time, alarmAble,
+                            notifyAble, info, color);
                     courseList.add(course);
                 }
             }
@@ -186,9 +215,12 @@ public class TableLocalDataSource implements TableDataSource {
         values.put(TableDbHelper.COLUMN_NAME, course.name);
         values.put(TableDbHelper.COLUMN_ROOM, course.room);
         values.put(TableDbHelper.COLUMN_TEACHER, course.teacher);
-        values.put(TableDbHelper.COLUMN_DAY, course.day);
-        values.put(TableDbHelper.COLUMN_START, course.start);
         values.put(TableDbHelper.COLUMN_CLASSNUM, course.classNum);
+        values.put(TableDbHelper.COLUMN_TIME, course.time);
+        values.put(TableDbHelper.COLUMN_ALARMABLE, course.alarmAble);
+        values.put(TableDbHelper.COLUMN_NOTIFYABLE, course.notifyAble);
+        values.put(TableDbHelper.COLUMN_INFO, course.info);
+        values.put(TableDbHelper.COLUMN_COLOR, course.color);
 
         String selection = TableDbHelper.COLUMN_ID + " LIKE ?";
         String[] selectionArgs = {course.id};

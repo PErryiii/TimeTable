@@ -12,6 +12,7 @@ public class EditNoteContract {
     interface Presenter extends BasePresenter{
         void loadNote();
         void saveNote(String note);
+        void deleteNote();
     }
 
     interface View extends BaseView<Presenter>{

@@ -20,9 +20,9 @@ public interface TableDataSource {
 
     void saveCourse(Course course);
     void deleteCourse(String courseId);
+    void deleteTable();
     void getCourse(String courseId, loadCourseCallback loadCourseCallback);
     void getTable(loadTableCallback loadTableCallback);
     void updateCourse(Course course);
     void cacheEnable(boolean enable);
-
 }

@@ -2,6 +2,7 @@
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/layout_editTable"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
@@ -19,16 +20,16 @@
             android:layout_height="wrap_content"
             android:text="编辑课程"
             android:textSize="20dp"
-            android:textColor="#000"
+            android:textColor="#FFF"
             android:layout_gravity="center"/>
         <ImageButton
-            android:id="@+id/btn_editTable_save"
+            android:id="@+id/btn_editTable_delete"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="right|center_vertical"
             android:layout_marginRight="20dp"
             android:textSize="15dp"
-            android:src="@mipmap/done_36x36"
+            android:src="@mipmap/delete_white_36x36"
             android:background="@color/colorYellow300"/>
     </android.support.v7.widget.Toolbar>
 
@@ -38,7 +39,7 @@
         app:met_floatingLabelTextSize="15dp"
         android:hint="课程名"
         style="@style/EditTableEditText"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="25dp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/toolbar_editTable_title"/>
@@ -62,80 +63,130 @@
         app:layout_constraintTop_toBottomOf="@+id/editText_course_room"/>
 
     <TextView
+        android:id="@+id/text_course_time"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textSize="18dp"
+        android:hint="时间"
+        android:gravity="start"
+        android:textColor="#AAA"
+        android:layout_marginTop="25dp"
+        app:layout_constraintLeft_toLeftOf="@id/editText_course_teacher"
+        app:layout_constraintRight_toLeftOf="@id/switch_course_alarmAble"
+        app:layout_constraintTop_toBottomOf="@id/editText_course_teacher"/>
+
+    <android.support.v7.widget.SwitchCompat
+        android:id="@+id/switch_course_alarmAble"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:text="闹钟"
+        android:layout_marginRight="8dp"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="@id/text_course_time"
+        app:layout_constraintBottom_toBottomOf="@id/text_course_time"
+        app:layout_constraintRight_toLeftOf="@id/switch_course_notifyAble"/>
+
+    <android.support.v7.widget.SwitchCompat
+        android:id="@+id/switch_course_notifyAble"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:text="通知"
+        app:layout_constraintTop_toTopOf="@id/text_course_time"
+        app:layout_constraintBottom_toBottomOf="@id/text_course_time"
+        app:layout_constraintRight_toRightOf="@id/editText_course_teacher"/>
+
+    <View
+        android:layout_width="0dp"
+        android:layout_height="0.5dp"
+        android:background="#AAA"
+        android:layout_marginTop="8dp"
+        app:layout_constraintTop_toBottomOf="@id/text_course_time"
+        app:layout_constraintLeft_toLeftOf="@id/editText_course_teacher"
+        app:layout_constraintRight_toRightOf="@id/editText_course_teacher"/>
+
+    <TextView
         android:id="@+id/one"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="星期几"
+        android:text="节数"
         android:textSize="18dp"
-        android:layout_marginTop="70dp"
-        app:layout_constraintTop_toBottomOf="@id/editText_course_teacher"
+        android:textColor="#AAA"
+        android:layout_marginTop="33dp"
+        app:layout_constraintTop_toBottomOf="@id/text_course_time"
         app:layout_constraintLeft_toLeftOf="@id/editText_course_teacher" />
-    <org.angmarch.views.NiceSpinner
-        android:id="@+id/spinner_course_day"
-        android:gravity="center"
+
+    <android.support.v7.widget.AppCompatSpinner
+        android:id="@+id/spinner_editTable_classNum"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="10dp"
-        app:layout_constraintTop_toBottomOf="@id/editText_course_teacher"
-        app:layout_constraintLeft_toRightOf="@id/one"
+        android:layout_marginLeft="20dp"
+        android:entries="@array/classNum"
+        android:spinnerMode="dialog"
+        android:scrollbars="none"
         app:layout_constraintTop_toTopOf="@id/one"
-        app:layout_constraintBottom_toBottomOf="@id/one"/>
-    <ImageView
-        android:layout_width="0dp"
-        android:layout_height="1sp"
-        android:background="#DDD"
-        app:layout_constraintLeft_toLeftOf="@id/editText_course_teacher"
-        app:layout_constraintRight_toRightOf="@id/editText_course_teacher"
-        app:layout_constraintTop_toBottomOf="@+id/spinner_course_day"/>
+        app:layout_constraintLeft_toRightOf="@id/one">
+    </android.support.v7.widget.AppCompatSpinner>
 
-    <TextView
-        android:id="@+id/two"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="第几节"
-        android:textSize="18dp"
-        android:layout_marginTop="40dp"
-        app:layout_constraintTop_toBottomOf="@id/one"
-        app:layout_constraintLeft_toLeftOf="@id/one" />
-    <org.angmarch.views.NiceSpinner
-        android:id="@+id/spinner_course_start"
-        android:gravity="center"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintRight_toRightOf="@id/spinner_course_day"
-        app:layout_constraintTop_toTopOf="@id/two"
-        app:layout_constraintBottom_toBottomOf="@id/two"/>
-    <ImageView
+    <com.rengwuxian.materialedittext.MaterialEditText
+        android:id="@+id/editText_course_info"
         android:layout_width="0dp"
-        android:layout_height="1sp"
-        android:background="#DDD"
+        android:layout_height="150dp"
+        android:layout_marginTop="35dp"
+        android:hint="备注"
+        android:padding="10dp"
+        android:gravity="start"
+        app:met_hideUnderline="true"
+        app:layout_constraintTop_toBottomOf="@id/spinner_editTable_classNum"
         app:layout_constraintLeft_toLeftOf="@id/editText_course_teacher"
-        app:layout_constraintRight_toRightOf="@id/editText_course_teacher"
-        app:layout_constraintTop_toBottomOf="@+id/spinner_course_start"/>
+        app:layout_constraintRight_toRightOf="@id/editText_course_teacher" />
 
-    <TextView
-        android:id="@+id/three"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="几节课"
-        android:textSize="18dp"
-        android:layout_marginTop="40dp"
-        app:layout_constraintTop_toBottomOf="@id/two"
-        app:layout_constraintLeft_toLeftOf="@id/two"/>
-    <org.angmarch.views.NiceSpinner
-        android:id="@+id/spinner_course_classNum"
-        android:gravity="center"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintRight_toRightOf="@id/spinner_course_start"
-        app:layout_constraintTop_toTopOf="@id/three"
-        app:layout_constraintBottom_toBottomOf="@id/three"/>
-    <ImageView
+    <!--备注的边框-->
+    <!--上-->
+    <View
         android:layout_width="0dp"
-        android:layout_height="1sp"
-        android:background="#DDD"
+        android:layout_height="0.5dp"
+        android:background="#AAA"
+        app:layout_constraintTop_toTopOf="@id/editText_course_info"
         app:layout_constraintLeft_toLeftOf="@id/editText_course_teacher"
-        app:layout_constraintRight_toRightOf="@id/editText_course_teacher"
-        app:layout_constraintTop_toBottomOf="@+id/spinner_course_classNum"/>
+        app:layout_constraintRight_toRightOf="@id/editText_course_teacher"/>
+    <!--下-->
+    <View
+        android:layout_width="0dp"
+        android:layout_height="0.5dp"
+        android:layout_marginTop="35dp"
+        android:background="#AAA"
+        app:layout_constraintBottom_toBottomOf="@id/editText_course_info"
+        app:layout_constraintLeft_toLeftOf="@id/editText_course_teacher"
+        app:layout_constraintRight_toRightOf="@id/editText_course_teacher"/>
+    <!--左-->
+    <View
+        android:layout_width="0.5dp"
+        android:layout_height="0dp"
+        android:background="#AAA"
+        app:layout_constraintLeft_toLeftOf="@id/editText_course_info"
+        app:layout_constraintTop_toTopOf="@id/editText_course_info"
+        app:layout_constraintBottom_toBottomOf="@id/editText_course_info"/>
+    <!--右-->
+    <View
+        android:layout_width="0.5dp"
+        android:layout_height="0dp"
+        android:background="#AAA"
+        app:layout_constraintRight_toRightOf="@id/editText_course_info"
+        app:layout_constraintTop_toTopOf="@id/editText_course_info"
+        app:layout_constraintBottom_toBottomOf="@id/editText_course_info"/>
+
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab_editTable_save"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="25dp"
+        app:backgroundTint="@color/colorYellow300"
+        app:rippleColor="@color/colorWhite"
+        android:src="@mipmap/done_36x36"
+        app:borderWidth="0dp"
+        app:fabSize="auto"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
 
 </android.support.constraint.ConstraintLayout>

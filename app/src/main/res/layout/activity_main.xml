@@ -18,14 +18,15 @@
         <android.support.v7.widget.Toolbar
             android:id="@+id/toolbar_table_title"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
+            android:layout_height="wrap_content"
+            android:fitsSystemWindows="true"
             android:background="@color/colorYellow300">
             <TextView
                 android:id="@+id/text_main_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:text="第5周"
+                android:text="课程表"
                 android:textSize="18dp"
                 android:fitsSystemWindows="true"/>
         </android.support.v7.widget.Toolbar>

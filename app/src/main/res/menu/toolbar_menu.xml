@@ -3,14 +3,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/menu_table_addTable"
-        android:title="添加课程"
-        android:icon="@mipmap/add_black_24x24"
-        app:showAsAction="never"/>
-
-    <item android:id="@+id/menu_table_deleteTable"
+        android:id="@+id/menu_table_deleteTable"
         android:title="删除课程"
-        android:icon="@mipmap/menu_black_36x36"
+        android:icon="@mipmap/delete_black_36x36"
         app:showAsAction="never"/>
 
 </menu>

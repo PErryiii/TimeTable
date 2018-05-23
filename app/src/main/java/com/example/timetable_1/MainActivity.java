@@ -1,15 +1,33 @@
 package com.example.timetable_1;
 
+import android.Manifest;
+import android.annotation.TargetApi;
+import android.content.ContentResolver;
+import android.content.ContentUris;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
+import android.os.Build;
 import android.preference.PreferenceManager;
+import android.provider.DocumentsContract;
+import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -22,13 +40,18 @@ import android.widget.Toast;
 import org.litepal.crud.DataSupport;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
+import de.hdodenhof.circleimageview.CircleImageView;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Response;
-import tableEdit.EditTableActivity;
+import tableData.Course;
+import tableData.TableDataSource;
+import tableData.TableLocalDataSource;
 import tableList.Table;
+import tableList.TableAdapter;
 import weather.db.City;
 import weather.db.Country;
 import weather.db.Province;
@@ -36,9 +59,10 @@ import weather.gson.Weather;
 import weather.util.HttpUtil;
 import weather.util.Utility;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends BaseActivity {
 
-    Table table = new Table();
+    private TableLocalDataSource tableLocalDataSource;
+    private TableAdapter adapter;
 
     private TabLayout tabLayout_main_mainTitle;
     private ViewPager viewPager_main_mainContent;
@@ -49,6 +73,7 @@ public class MainActivity extends AppCompatActivity {
     private LinearLayout layout_nav_weather;
     private TextView text_nav_degree;
     private TextView text_nav_info;
+    private CircleImageView head;
 
     /*各个地级的列表*/
     private List<Province> provinceList;
@@ -62,6 +87,9 @@ public class MainActivity extends AppCompatActivity {
     private String province;
     private String city;
     private String country;
+    /*头像*/
+    private Uri imageUri;
+    private String filePath;
 
 
     @Override
@@ -69,13 +97,18 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        tableLocalDataSource = TableLocalDataSource.getINSTANCE(this);
+
         bindView();
 
-        province = "广东";
-        city = "广州";
-        country = "番禺";
-        getWeatherId(province, city, country);
+        /*获取本地缓存赋值于weatherString*/
+        SharedPreferences pref1 = PreferenceManager.getDefaultSharedPreferences(this);
+        String weatherString1 = pref1.getString("weather", null);
+        if (weatherString1 != null){
+            Weather weather = Utility.handleWeatherResponse(weatherString1);
+            weatherId = weather.basic.weather_id;}
         requestWeather(weatherId);
+
 
         initTabLayout();
         initViewPager();
@@ -108,7 +141,7 @@ public class MainActivity extends AppCompatActivity {
         layout_nav_weather = findViewById(R.id.layout_nav_weather);
         text_nav_degree = findViewById(R.id.text_nav_degree);
         text_nav_info = findViewById(R.id.text_nav_info);
-
+        head = findViewById(R.id.head);
 
         //点击打开天气详情
         layout_nav_weather.setOnClickListener(new View.OnClickListener() {
@@ -127,6 +160,29 @@ public class MainActivity extends AppCompatActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setHomeAsUpIndicator(R.mipmap.menu_black_36x36);
         }
+
+        /**
+         * 设置头像
+         * */
+        View headerView = navigationView_main.getHeaderView(0);
+        head = headerView.findViewById(R.id.head);
+        SharedPreferences pref1 = PreferenceManager.getDefaultSharedPreferences(this);
+        String uri = pref1.getString("imagePath", null);
+        displayImage(uri);
+        head.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+               if (ContextCompat.checkSelfPermission(MainActivity.this,
+                       Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
+                   ActivityCompat.requestPermissions(MainActivity.this,
+                           new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE} ,1);
+               } else {
+                   Intent intent = new Intent("android.intent.action.GET_CONTENT");
+                   intent.setType("image/*");
+                   startActivityForResult(intent, 111);
+               }
+            }
+        });
     }
 
     /*初始化TabLayout*/
@@ -144,7 +200,7 @@ public class MainActivity extends AppCompatActivity {
                 viewPager_main_mainContent.setCurrentItem(tab.getPosition());
                 switch (tab.getPosition()){
                     case 0:
-                        text_main_title.setText("第5周");
+                        text_main_title.setText("课程表");
                         break;
                     case 1:
                         text_main_title.setText("笔记");
@@ -207,12 +263,10 @@ public class MainActivity extends AppCompatActivity {
         // 动态设置ToolBar状态
         switch (viewPager_main_mainContent.getCurrentItem()){
             case 0:
-                menu.findItem(R.id.menu_table_addTable).setVisible(true);
                 menu.findItem(R.id.menu_table_deleteTable).setVisible(false);
                 break;
             case 1:
-                menu.findItem(R.id.menu_table_addTable).setVisible(false);
-                menu.findItem(R.id.menu_table_deleteTable).setVisible(true);
+                menu.findItem(R.id.menu_table_deleteTable).setVisible(false);
                 break;
                 default:
         }
@@ -225,16 +279,140 @@ public class MainActivity extends AppCompatActivity {
             case android.R.id.home:
                 drawerLayout_main.openDrawer(GravityCompat.START);
                 break;
-            case R.id.menu_table_addTable:
-                Intent intent = new Intent(this, EditTableActivity.class);
-                startActivity(intent);
-                break;
             case R.id.menu_table_deleteTable:
-                Toast.makeText(this, "删除", Toast.LENGTH_SHORT).show();
+                final AlertDialog alertDialog;
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setTitle("警告！");
+                builder.setMessage("是否删除课程表！");
+                builder.setPositiveButton("是", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        /*删除所有的课程*/
+                        final List<Course> tableList = new ArrayList<>();
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                // 耗时的操作，在子线程中进行。
+                                try {
+                                    for (int i = 0; i < 84; i++){
+                                        Course course = new Course(Integer.toString(i));
+                                        tableLocalDataSource.updateCourse(course);
+                                    }
+                                    tableLocalDataSource.getTable(new TableDataSource.loadTableCallback() {
+                                        @Override
+                                        public void loadSuccess(List<Course> courseList) {
+                                            for (Course course : courseList){
+                                                tableList.add(course);
+                                            }
+                                        }
+
+                                        @Override
+                                        public void loadFailed() {
+
+                                        }
+                                    });
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }).start();
+                    }
+                });
+                builder.setNegativeButton("否", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+                alertDialog = builder.create();
+                alertDialog.show();
                 break;
                 default:
         }
         return true;
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        switch (requestCode){
+            case 111:
+                if (resultCode == RESULT_OK){
+                    //判断手机系统版本号
+                    if (Build.VERSION.SDK_INT >= 19){
+                        //4.4及以上系统
+                        handleImageOnKitKat(data);
+                    } else {
+                        //4.4以下系统
+                        handleImageBeforeKitKat(data);
+                    }
+                }
+                break;
+                default:
+                    break;
+        }
+    }
+
+    @TargetApi(19)
+    private void handleImageOnKitKat(Intent data){
+        String imagePath = null;
+        Uri uri = data.getData();
+        if (DocumentsContract.isDocumentUri(this, uri)){
+            //若是document类型的Uri，则通过document id 处理
+            String docId = DocumentsContract.getDocumentId(uri);
+            if ("com.android.providers.media.documents".equals(uri.getAuthority())){
+                String id = docId.split(":")[1];
+                String selection = MediaStore.Images.Media._ID + "=" + id;
+                imagePath = getImagePath(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, selection);
+            } else if ("com.android.providers.download.documents".equals(uri.getAuthority())){
+                Uri contentUri = ContentUris.withAppendedId(Uri
+                        .parse("content://downloads/public_downloads"), Long.valueOf(docId));
+                imagePath = getImagePath(contentUri, null);
+            }
+        } else if ("content".equalsIgnoreCase(uri.getScheme())){
+            //如果是content类型的Uri，则使用普通方法处理
+            imagePath = getImagePath(uri, null);
+        } else if ("file".equalsIgnoreCase(uri.getScheme())){
+            //如果是file类型的Uri，直接获取图片路径即可
+            imagePath = uri.getPath();
+        }
+        SharedPreferences.Editor editor = PreferenceManager.
+                getDefaultSharedPreferences(MainActivity.this).edit();
+        editor.putString("imagePath", imagePath);
+        editor.apply();
+        displayImage(imagePath);    //根据图片路径显示图片
+    }
+
+    private void handleImageBeforeKitKat(Intent data){
+        Uri uri = data.getData();
+        String imagePath = getImagePath(uri, null);
+        SharedPreferences.Editor editor = PreferenceManager.
+                getDefaultSharedPreferences(MainActivity.this).edit();
+        editor.putString("imagePath", imagePath);
+        editor.apply();
+        displayImage(imagePath);
+    }
+
+    private String getImagePath(Uri uri, String selection){
+        String path = null;
+        //通过Uri和selection来获取真实的图片路径
+        Cursor cursor = getContentResolver().query(uri, null, selection,
+                null, null);
+        if (cursor != null){
+            if (cursor.moveToFirst()){
+                path = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DATA));
+            }
+            cursor.close();
+        }
+        return path;
+    }
+
+    private void displayImage(String imagePath){
+        if (imagePath != null){
+            Bitmap bitmap = BitmapFactory.decodeFile(imagePath);
+            head.setImageBitmap(bitmap);
+        }
     }
 
     /**
@@ -322,8 +500,7 @@ public class MainActivity extends AppCompatActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Toast.makeText(MainActivity.this, "加载失败",
-                                Toast.LENGTH_SHORT).show();
+
                     }
                 });
             }
@@ -378,7 +555,7 @@ public class MainActivity extends AppCompatActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Toast.makeText(MainActivity.this, "获取天气信息失败1",
+                        Toast.makeText(MainActivity.this, "获取天气信息失败",
                                 Toast.LENGTH_SHORT).show();
                     }
                 });
@@ -399,7 +576,7 @@ public class MainActivity extends AppCompatActivity {
                             editor.apply();
                             showWeatherInfo(weather);
                         } else {
-                            Toast.makeText(MainActivity.this, "获取天气信息失败2",
+                            Toast.makeText(MainActivity.this, "首次使用请点击天气设置位置",
                                     Toast.LENGTH_SHORT).show();
                         }
                     }

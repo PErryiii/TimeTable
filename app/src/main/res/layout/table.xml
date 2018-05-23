@@ -20,36 +20,28 @@
             android:layout_height="match_parent"
             android:gravity="center"
             android:textSize="12dp"
-            android:textColor="#000"
-            android:text="12周"/>
+            android:textColor="#000" />
         <TextView
             android:id="@+id/text_table_monday"
-            style="@style/TextWeekday"
-            android:text="周一"/>
+            style="@style/TextWeekday" />
         <TextView
             android:id="@+id/text_table_tuesday"
-            style="@style/TextWeekday"
-            android:text="周二"/>
+            style="@style/TextWeekday" />
         <TextView
             android:id="@+id/text_table_wednesday"
-            style="@style/TextWeekday"
-            android:text="周三"/>
+            style="@style/TextWeekday" />
         <TextView
             android:id="@+id/text_table_thursday"
-            style="@style/TextWeekday"
-            android:text="周四"/>
+            style="@style/TextWeekday" />
         <TextView
             android:id="@+id/text_table_friday"
-            style="@style/TextWeekday"
-            android:text="周五"/>
+            style="@style/TextWeekday" />
         <TextView
             android:id="@+id/text_table_saturday"
-            style="@style/TextWeekday"
-            android:text="周六"/>
+            style="@style/TextWeekday" />
         <TextView
             android:id="@+id/text_table_sunday"
-            style="@style/TextWeekday"
-            android:text="周日"/>
+            style="@style/TextWeekday" />
     </LinearLayout>
 
     <!--正文-->
@@ -58,7 +50,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:scrollbars="none"
-        android:background="@color/colorOrange50">
+        android:background="@color/colorYellow100">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -114,56 +106,16 @@
 
             <!--星期一到星期天的布局-->
             <RelativeLayout
-                android:id="@+id/layout_table_monday"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:orientation="vertical"
-                android:layout_margin="1dp"/>
-            <RelativeLayout
-                android:id="@+id/layout_table_tuesday"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:orientation="vertical"
-                android:layout_margin="1dp"/>
-            <RelativeLayout
-                android:id="@+id/layout_table_wednesday"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:orientation="vertical"
-                android:layout_margin="1dp"/>
-            <RelativeLayout
-                android:id="@+id/layout_table_thursday"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:orientation="vertical"
-                android:layout_margin="1dp"/>
-            <RelativeLayout
-                android:id="@+id/layout_table_friday"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:orientation="vertical"
-                android:layout_margin="1dp"/>
-            <RelativeLayout
-                android:id="@+id/layout_table_saturday"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:orientation="vertical"
-                android:layout_margin="1dp"/>
-            <RelativeLayout
-                android:id="@+id/layout_table_sunday"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:orientation="vertical"
-                android:layout_marginTop="1dp"
-                android:layout_marginLeft="1dp"
-                android:layout_marginBottom="1dp"/>
+                android:background="@color/colorYellow50"
+                android:descendantFocusability="blocksDescendants">
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/recyclerView_table_content"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+                </android.support.v7.widget.RecyclerView>
+            </RelativeLayout>
 
         </LinearLayout>
 

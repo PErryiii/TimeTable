@@ -2,6 +2,7 @@ package noteEdit;
 
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
+import android.widget.TextView;
 
 import noteData.NoteBean;
 import noteData.NoteDataSource;
@@ -59,6 +60,11 @@ public class EditNotePresenter implements EditNoteContract.Presenter {
         } else {
             updateNote(loadNoteId, note);
         }
+    }
+
+    @Override
+    public void deleteNote() {
+        noteRepository.deleteNote(loadNoteId);
     }
 
     private void createNote(String content){
