@@ -76,21 +76,21 @@
         app:layout_constraintTop_toBottomOf="@id/editText_course_teacher"/>
 
     <android.support.v7.widget.SwitchCompat
-        android:id="@+id/switch_course_alarmAble"
-        android:layout_width="wrap_content"
-        android:layout_height="0dp"
-        android:text="闹钟"
-        android:layout_marginRight="8dp"
-        android:visibility="gone"
-        app:layout_constraintTop_toTopOf="@id/text_course_time"
-        app:layout_constraintBottom_toBottomOf="@id/text_course_time"
-        app:layout_constraintRight_toLeftOf="@id/switch_course_notifyAble"/>
-
-    <android.support.v7.widget.SwitchCompat
         android:id="@+id/switch_course_notifyAble"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
         android:text="通知"
+        android:layout_marginRight="8dp"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="@id/text_course_time"
+        app:layout_constraintBottom_toBottomOf="@id/text_course_time"
+        app:layout_constraintRight_toLeftOf="@id/switch_course_alarmAble"/>
+
+    <android.support.v7.widget.SwitchCompat
+        android:id="@+id/switch_course_alarmAble"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:text="闹钟"
         app:layout_constraintTop_toTopOf="@id/text_course_time"
         app:layout_constraintBottom_toBottomOf="@id/text_course_time"
         app:layout_constraintRight_toRightOf="@id/editText_course_teacher"/>

@@ -5,8 +5,10 @@ import android.app.PendingIntent;
 import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.RequiresApi;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -18,6 +20,8 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.TimePicker;
+import android.widget.Toast;
+
 import com.example.timetable_1.R;
 import com.rengwuxian.materialedittext.MaterialEditText;
 
@@ -44,11 +48,11 @@ public class EditTableActivity extends AppCompatActivity {
     private SwitchCompat switch_course_notifyAble;
     private MaterialEditText editText_course_info;
     private FloatingActionButton fab_editTable_save;
-
+    //时间
     public static final String COURSE_ID = "courseId";
     private String courseId;
     private Calendar calendar = Calendar.getInstance();
-
+    //闹钟和通知
     private AlarmManager manager;
     private PendingIntent pendingIntent;
 
@@ -104,6 +108,14 @@ public class EditTableActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Course course = new Course(courseId);
                 tableLocalDataSource.updateCourse(course);
+                //取消闹钟
+                Intent intent = new Intent("tableEdit.RING");
+                pendingIntent = PendingIntent.getBroadcast(EditTableActivity.this,
+                        Integer.parseInt(courseId), intent, PendingIntent.FLAG_NO_CREATE);
+                if (pendingIntent != null){
+                    AlarmManager alarm = (AlarmManager)getSystemService(ALARM_SERVICE);
+                    alarm.cancel(pendingIntent);
+                }
                 finish();
             }
         });
@@ -131,6 +143,7 @@ public class EditTableActivity extends AppCompatActivity {
                 int minute = calendar.get(Calendar.MINUTE);
                 new TimePickerDialog(EditTableActivity.this,
                         new TimePickerDialog.OnTimeSetListener() {
+                    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
                     @Override
                     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
                         text_course_time.setText("时间      " + hourOfDay + ":" + minute);
@@ -138,6 +151,8 @@ public class EditTableActivity extends AppCompatActivity {
                         calendar.set(Calendar.MINUTE, minute);
                         calendar.set(Calendar.SECOND, 0);
                         calendar.set(Calendar.MILLISECOND, 0);
+                        Toast.makeText(EditTableActivity.this,
+                                "设置了闹钟或通知记得保存哦~", Toast.LENGTH_SHORT).show();
                     }
                 }, hour, minute, true).show();
             }
@@ -205,53 +220,87 @@ public class EditTableActivity extends AppCompatActivity {
         editor.apply();
 
         /*处理闹钟和通知*/
-        if (notifyAble){
+        if (notifyAble || alarmAble){
             //01.计算闹钟的时间
             //现在的时间
             final Calendar calendar1 = Calendar.getInstance();
             calendar1.setTimeZone(TimeZone.getTimeZone("GMT+8:00"));
             calendar1.setTimeInMillis(System.currentTimeMillis());
-            int currentHour = calendar1.get(Calendar.HOUR_OF_DAY) * 60 * 60 * 1000;
-            int currentMinute = calendar1.get(Calendar.MINUTE) * 60 * 1000;
-            int currentTime = currentHour + currentMinute;
+            long currentHour = calendar1.get(Calendar.HOUR_OF_DAY) * 60 * 60 * 1000;
+            long currentMinute = calendar1.get(Calendar.MINUTE) * 60 * 1000;
+            long currentTime = currentHour + currentMinute;
             //闹钟的小时和分钟
-            int alarmHour = calendar.get(Calendar.HOUR_OF_DAY)  * 60 * 60 * 1000;
-            int alarmMinute = calendar.get(Calendar.MINUTE) * 60 * 1000;
-            int alarmTime = alarmHour + alarmMinute;
+            long alarmHour = calendar.get(Calendar.HOUR_OF_DAY)  * 60 * 60 * 1000;
+            long alarmMinute = calendar.get(Calendar.MINUTE) * 60 * 1000;
+            long alarmTime = alarmHour + alarmMinute;
             //相差的天数的毫秒数
             int weekDay = calendar1.get(Calendar.DAY_OF_WEEK) - 1;   //现在周几
             int courseTime = Integer.parseInt(courseId) + 1;    //课程周几
             int day = courseTime%7 - weekDay;   //相差的天数
-            int dayTime = 60 * 60 * 1000 * 24 * day;
+            long dayTime = 60 * 60 * 1000 * 24 * day;
             //相差时间的毫秒数
-            int aWeek = 60 * 60 * 1000 * 24 * 7;
+            long aWeek = 60 * 60 * 1000 * 24 * 7;
             //02.判断是否加一周
-            int triggerTime = 0;
-            if (dayTime > 0){
+            long triggerTime = 0;
+            if (day > 0){       //天数大于0，则直接加上天数
                 triggerTime = alarmTime - currentTime + dayTime;
-            } else if (dayTime < 0){
-                triggerTime = alarmTime - currentTime + dayTime + aWeek;
-            } else {
+            } else {    //天数小于1，则判断是否需要加一周
                 if (alarmTime > currentTime){
                     triggerTime = alarmTime - currentTime;
                 } else {
                     triggerTime = alarmTime - currentTime + aWeek;
                 }
             }
-            long realTime = System.currentTimeMillis() + triggerTime;
-            /*设置服务*/
+            Calendar calendar2 = Calendar.getInstance();        //用于将秒钟归零
+            calendar2.setTimeInMillis(System.currentTimeMillis());
+            calendar2.set(Calendar.SECOND, 0);      //归零
+            long realTime = calendar2.getTimeInMillis() + triggerTime;
             //03.实例化闹钟
             manager =(AlarmManager) getSystemService(ALARM_SERVICE);
-            //05.时间一到，执行相应操作
-            Intent intent = new Intent();
-            intent.putExtra("courseId", Integer.parseInt(courseId));
-            intent.setAction("tableEdit.RING");
-            pendingIntent = PendingIntent.getBroadcast(this,
-                    Integer.parseInt(courseId), intent, PendingIntent.FLAG_UPDATE_CURRENT);
-            //04.设置闹钟
-            manager.setExact(AlarmManager.RTC_WAKEUP, realTime, pendingIntent);
-        } else if (!notifyAble){
-            manager.cancel(pendingIntent);
+            //04.根据闹钟开关是否打开进行相应操作
+            if (alarmAble){
+                //2.时间一到，执行相应操作
+                Intent intent = new Intent("tableEdit.RING");
+
+                intent.putExtra("courseId", Integer.parseInt(courseId));
+                pendingIntent = PendingIntent.getBroadcast(this,
+                        Integer.parseInt(courseId), intent, PendingIntent.FLAG_UPDATE_CURRENT);
+                //1.设置闹钟
+                if (Build.VERSION.SDK_INT >= 19){    //API19以上
+                    manager.setExact(AlarmManager.RTC_WAKEUP, realTime, pendingIntent);
+                    //处理显示的alarmInfo
+                    String alarmInfo = "已将闹钟设置为从现在起";
+                    double toastTime = triggerTime/ 60000;     //换成分钟
+                    int toastDay;
+                    int toastHour;
+                    int toastMinute;
+                    if (toastTime < 60){    //如果小于一小时，则直接显示分钟
+                        alarmInfo += (int)toastTime + "分钟";
+                    } else {    //如果大于一小时，则换算成小时+分钟
+                        toastMinute = (int) toastTime % 60;   //分钟
+                        toastHour = (int) toastTime / 60;     //小时
+                        if (toastHour < 24){        //如果小时小于24小时，则显示小时+分钟
+                            alarmInfo += toastHour + "小时" + toastMinute + "分钟";
+                        } else {        //如果小时大于24，则显示天+小时+分钟
+                            toastDay = toastHour / 24;      //天
+                            toastHour = toastHour % 24;      //小时
+                            alarmInfo += toastDay + "天" + toastHour + "小时" + toastMinute + "分钟";
+                        }
+                    }
+                    alarmInfo += "后提醒。";
+                    Toast.makeText(this, alarmInfo, Toast.LENGTH_SHORT).show();
+                } else {    //API19以下
+                    manager.set(AlarmManager.RTC_WAKEUP, realTime, pendingIntent);
+                    String alarmInfo = "闹钟将在" + alarmTime +"分钟后响起！";
+                    Toast.makeText(this, alarmInfo, Toast.LENGTH_SHORT).show();
+                }
+            } else if (!alarmAble){     //取消闹钟
+                Intent intent = new Intent("tableEdit.RING");
+                pendingIntent = PendingIntent.getBroadcast(this,
+                        Integer.parseInt(courseId), intent, PendingIntent.FLAG_NO_CREATE);
+                AlarmManager alarm = (AlarmManager)getSystemService(ALARM_SERVICE);
+                alarm.cancel(pendingIntent);
+            }
         }
     }
 

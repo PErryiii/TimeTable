@@ -4,16 +4,16 @@
     android:id="@+id/cardView_tableItem"
     android:layout_width="match_parent"
     android:layout_height="60dp"
-    android:layout_margin="0.25dp"
-    app:cardElevation="0dp"
-    app:cardBackgroundColor="@color/colorOrange50">
+    android:layout_marginLeft="0.25dp"
+    android:layout_marginRight="0.25dp"
+    app:cardCornerRadius="0dp"
+    app:cardElevation="0dp">
 
     <TextView
         android:id="@+id/text_tableItem_content"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:textSize="12dp"
-        android:textColor="@color/colorOrange50"
         android:layout_gravity="center"
         android:gravity="center"/>
 
